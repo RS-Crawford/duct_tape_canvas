@@ -50,7 +50,25 @@ Strip.prototype.contains = function(coord) {
    - method should return true / false to indicate if there's an overlap
 */
 Strip.prototype.overlaps = function(otherStrip){
+  var strip = this,
+      intersections = [],
+      // fn getLinesFromStrip added to util.js
+      stripLines = getLinesFromStrip(strip),
+      otherStripLines = getLinesFromStrip(otherStrip),
+      topLeft = { x: 0, y: 0 },
+      bottomRight = { x: window.innerWidth, y: window.innerHeight };
 
+  intersections.push(getLineIntersection(stripLines.bottomLine, otherStripLines.bottomLine, topLeft, bottomRight));
+  intersections.push(getLineIntersection(stripLines.bottomLine, otherStripLines.topLine, topLeft, bottomRight));
+  intersections.push(getLineIntersection(stripLines.topLine, otherStripLines.bottomLine, topLeft, bottomRight));
+  intersections.push(getLineIntersection(stripLines.topLine, otherStripLines.topLine, topLeft, bottomRight));
+  var l = intersections.length-1;
+
+  for ( l; l >= 0; l-- ) {
+    if ( intersections[l] ) {
+      return true;
+    }
+  }
 
   return false;
 };

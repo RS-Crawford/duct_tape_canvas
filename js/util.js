@@ -18,6 +18,14 @@
 function deg2rad( d ) { return d * Math.PI / 180 }
 function rad2deg( r ) { return r / Math.PI * 180 }
 
+
+function getLinesFromStrip (strip) {
+  var results = {};
+  results.bottomLine = { m: Math.tan(strip.rotation) , b: strip.offset };
+  results.topLine = { m: Math.tan(strip.rotation), b: (strip.offset + strip.yHeight) };
+  return results;
+}
+
 /*
   Helper method to find the point of intersection between two lines
   within a bounding rectangle, if it exists.

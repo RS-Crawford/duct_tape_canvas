@@ -21,6 +21,7 @@ var Wrapper = (function () {
           canvasElem = document.getElementById(opts.boardId);
 
       this.board.init(canvasElem, containerElem);
+
       this.strips = populateStrips(this.board, opts.wrapImage);
       this.redraw();
 
@@ -68,9 +69,25 @@ var Wrapper = (function () {
       - a method that returns true or false will work for todo D
       - you'll need the full set of overlapping strips for todo E
     */
-    getOverlappingStrips: function (index) {
+    getOverlappingStripsIndices: function (index) {
       // initialize the array of overlapping indices, if any
-      var overlaps = [];
+      var overlaps = [],
+          strips = this.strips,
+          l = strips.length-1,
+          clickedStrip = strips[index];
+
+      for ( l; l >= 0; l-- ) {
+        if ( l !== index ) {
+          if ( clickedStrip.overlaps(strips[l]) && _stripIsAbove(l, index) ) {
+            overlaps.push(l);
+          }
+        }
+      }
+
+      function _stripIsAbove (indexToCheck, indexClicked) {
+        return indexToCheck > indexClicked;
+      }
+
       return overlaps;
     },
 
@@ -80,7 +97,9 @@ var Wrapper = (function () {
      */
     evalClick: function (coord) {
       // Get the array index of the highest strip the click interacts with
-      var clickedIndex = this.getClickedStripIndex(coord);
+      var clickedIndex = this.getClickedStripIndex(coord),
+          strips = this.strips,
+          wrapper = this;
 
       // No strip at the given click
       if (clickedIndex < 0){
@@ -93,7 +112,8 @@ var Wrapper = (function () {
         This won't work until you complete the strip.overlaps todo
         and the Wrapper.getOverlappingStrips todo
       */
-      var overlappingStripIndices = this.getOverlappingStrips(clickedIndex);
+      var overlappingStripIndices = wrapper.getOverlappingStripsIndices(clickedIndex),
+          overlapLength = overlappingStripIndices.length;
 
       /*
        -------------------------------------------------------------------------------------
@@ -105,6 +125,13 @@ var Wrapper = (function () {
          and redraw the board
        */
 
+      if ( !overlapLength ) {
+        wrapper.removeStripByIndex(clickedIndex);
+      // @Todo E
+      } else if ( overlapLength ) {
+        wrapper.makeStripsFeedbackColor(overlappingStripIndices);
+      }
+
       /*
        -------------------------------------------------------------------------------------
        @Todo E: provide the user with validation feedback
@@ -112,6 +139,26 @@ var Wrapper = (function () {
        - If the user clicks a strip that's covered by another strip, redraw the overlapping
        strips with a color indicating they're obstructing the first strip
       */
+    },
+
+    removeStripByIndex: function (index) {
+      var wrapper = this,
+          strips = wrapper.strips;
+
+      strips.splice(index, 1);
+      wrapper.redraw();
+    },
+
+    makeStripsFeedbackColor: function (indicesArr) {
+      var wrapper = this,
+          strips = wrapper.strips,
+          feedbackColor = '#ff0000'; // red
+      
+      indicesArr.forEach(function (index) {
+        strips[index].color = feedbackColor;
+      });
+
+      wrapper.redraw();
     }
   };
 
