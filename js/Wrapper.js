@@ -113,7 +113,7 @@ var Wrapper = (function () {
         and the Wrapper.getOverlappingStrips todo
       */
       var overlappingStripIndices = wrapper.getOverlappingStripsIndices(clickedIndex),
-          overlapLength = overlappingStripIndices.length;
+          overlapsExist = overlappingStripIndices.length;
 
       /*
        -------------------------------------------------------------------------------------
@@ -125,10 +125,10 @@ var Wrapper = (function () {
          and redraw the board
        */
 
-      if ( !overlapLength ) {
+      if ( !overlapsExist ) {
         wrapper.removeStripByIndex(clickedIndex);
       // @Todo E
-      } else if ( overlapLength ) {
+      } else if ( overlapsExist ) {
         wrapper.makeStripsFeedbackColor(overlappingStripIndices);
       }
 
